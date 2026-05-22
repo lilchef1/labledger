@@ -1,42 +1,33 @@
-"""Generate soil report PDFs from parsed spreadsheet data."""
-
 import tempfile
 from pathlib import Path
 
-from jinja2 import Environment, FileSystemLoader
-from weasyprint import HTML
+from jinja2 import Environment, FileSystemLoader, BaseLoader
 
-from app.services.soil_ratings import (
-    get_rating_index,
-    get_rating_labels,
-    get_recommendation,
-    needs_woodruff,
-)
+from app.services.config_loader import DisciplineConfig
+from app.services.computations import COMPUTATION_REGISTRY
+from app.services.ratings import get_rating_index, get_rating_labels, get_recommendation, check_triggers
 from app.services.spreadsheet_parser import (
     build_address_line2,
     determine_crop_hort,
     determine_template_sections,
     format_date,
     format_value,
-    parse_soil_spreadsheet,
+    parse_spreadsheet,
 )
 
 TEMPLATE_DIR = Path(__file__).parent.parent / "templates"
 STATIC_DIR = Path(__file__).parent.parent / "static"
 
-env = Environment(loader=FileSystemLoader(str(TEMPLATE_DIR)))
-
 
 class AnalyteData:
-    """Prepared data for one analyte row in the report."""
-
-    def __init__(self, key, value, crop_hort_info=None):
+    def __init__(self, key, value, config: DisciplineConfig, crop_hort_info=None):
+        analyte_cfg = config.analytes.get(key)
         self.key = key
         self.display = format_value(value)
-        self.labels = get_rating_labels(key)
-        self.active_index = get_rating_index(key, value)
-
-        self.recommendation = get_recommendation(key, value)
+        self.labels = get_rating_labels(config, key)
+        self.active_index = get_rating_index(config, key, value)
+        self.color = analyte_cfg.color if analyte_cfg else "#FFC000"
+        self.recommendation = get_recommendation(config, key, value)
         self.unit_conv = ""
         self.unit_label = ""
         self.rec_unit = "lb/1000 sq.ft."
@@ -45,123 +36,132 @@ class AnalyteData:
             self.rec_unit = "lb/ac"
 
 
-def _build_analyte(key, sample_dict, crop_hort_info=None):
-    return AnalyteData(key, sample_dict.get(key), crop_hort_info)
+def _build_analyte(key, sample_dict, config, crop_hort_info=None):
+    return AnalyteData(key, sample_dict.get(key), config, crop_hort_info)
 
 
-def _build_optional_section_data(sample, sections):
-    """Build data dicts for optional report sections."""
+def _build_optional_section_data(sample, sections, config):
     result = {}
+    blocks = config.custom_blocks
 
     if "sar_paste" in sections:
+        fields = blocks.get("sar_paste", [])
         result["sar_paste_data"] = [
-            {"name": "Saturation", "unit": "%", "value": format_value(sample.get("Paste_Saturation")), "optimum": ""},
-            {"name": "Paste pH", "unit": "", "value": format_value(sample.get("Paste_pH")), "optimum": ""},
-            {"name": "Electric Conductivity (EC)", "unit": "mmho/cm", "value": format_value(sample.get("Paste_EC")), "optimum": ""},
-            {"name": "Bicarbonate (HCO3)", "unit": "meq/L", "value": format_value(sample.get("Paste_Bicarbonate")), "optimum": "3-10"},
-            {"name": "Chloride (Cl)", "unit": "meq/L", "value": format_value(sample.get("Paste_Cl")), "optimum": "<10"},
-            {"name": "Calcium (Ca)", "unit": "meq/L", "value": format_value(sample.get("Paste_Ca")), "optimum": "1-8"},
-            {"name": "Magnesium (Mg)", "unit": "meq/L", "value": format_value(sample.get("Paste_Mg")), "optimum": "0.3-4.6"},
-            {"name": "Sodium (Na)", "unit": "meq/L", "value": format_value(sample.get("Paste_Na")), "optimum": "0.2-1"},
-            {"name": "Potassium (K)", "unit": "meq/L", "value": format_value(sample.get("Paste_K")), "optimum": "1-3"},
-            {"name": "Sulfur (SO4)", "unit": "meq/L", "value": format_value(sample.get("Paste_SO4")), "optimum": "5-10"},
+            {
+                "name": f["name"],
+                "unit": f.get("unit", ""),
+                "value": format_value(sample.get(f["key"])),
+                "optimum": f.get("optimum", ""),
+            }
+            for f in fields
         ]
 
     if "carbon_nitrogen" in sections:
+        fields = blocks.get("carbon_nitrogen", [])
+        cn_data = []
         tc = sample.get("TC")
         tn = sample.get("TN")
-        cn_ratio = ""
-        if tc is not None and tn is not None and tn != 0:
-            try:
-                cn_ratio = format_value(float(tc) / float(tn))
-            except (ValueError, TypeError):
-                pass
 
-        result["cn_data"] = [
-            {"name": "Total Carbon (C)", "unit": "%", "value": format_value(tc)},
-            {"name": "Total Organic Carbon (TOC)", "unit": "%", "value": format_value(sample.get("TOC"))},
-            {"name": "Total Inorganic Carbon (TIC)", "unit": "%", "value": format_value(sample.get("TIC"))},
-            {"name": "Total Nitrogen (N)", "unit": "%", "value": format_value(tn)},
-            {"name": "C:N Ratio", "unit": "", "value": cn_ratio},
-            {"name": "Soil Respiration", "unit": "", "value": format_value(sample.get("Soil_Respiration"))},
-            {"name": "POX-C", "unit": "", "value": format_value(sample.get("POX_C"))},
-        ]
+        for f in fields:
+            if f["key"] == "_cn_ratio":
+                cn_ratio = ""
+                if tc is not None and tn is not None and tn != 0:
+                    try:
+                        cn_ratio = format_value(float(tc) / float(tn))
+                    except (ValueError, TypeError):
+                        pass
+                cn_data.append({"name": f["name"], "unit": f.get("unit", ""), "value": cn_ratio})
+            else:
+                cn_data.append({
+                    "name": f["name"],
+                    "unit": f.get("unit", ""),
+                    "value": format_value(sample.get(f["key"])),
+                })
+        result["cn_data"] = cn_data
 
     if "paw" in sections:
+        fields = blocks.get("paw", [])
         result["paw_data"] = [
-            {"name": "Field Capacity", "unit": "%", "value": format_value(sample.get("FC"))},
-            {"name": "Wilting Point", "unit": "%", "value": format_value(sample.get("WP"))},
-            {"name": "Plant Available Water", "unit": "%", "value": format_value(sample.get("PAW"))},
+            {"name": f["name"], "unit": f.get("unit", ""), "value": format_value(sample.get(f["key"]))}
+            for f in fields
         ]
 
     if "wsa" in sections:
+        fields = blocks.get("wsa", [])
         result["wsa_data"] = [
-            {"name": ">2000", "unit": "%", "value": format_value(sample.get(">2000"))},
-            {"name": "2000-500", "unit": "%", "value": format_value(sample.get("2000-500"))},
-            {"name": "500-250", "unit": "%", "value": format_value(sample.get("500-250"))},
-            {"name": "250-53", "unit": "%", "value": format_value(sample.get("250-53"))},
-            {"name": "<53", "unit": "%", "value": format_value(sample.get("<53"))},
-            {"name": "Total", "unit": "%", "value": format_value(sample.get("WSA"))},
+            {"name": f["name"], "unit": f.get("unit", ""), "value": format_value(sample.get(f["key"]))}
+            for f in fields
         ]
 
     if "mineralization" in sections:
+        fields = blocks.get("mineralization", [])
         result["mineralization_data"] = [
-            {"name": "NO3-N", "unit": "ppm", "value": format_value(sample.get("NO3_Mineralization"))},
-            {"name": "NH4-N", "unit": "ppm", "value": format_value(sample.get("NH4_Mineralization"))},
-            {"name": "Total Mineralization", "unit": "ppm", "value": format_value(sample.get("Total_Mineralization"))},
+            {"name": f["name"], "unit": f.get("unit", ""), "value": format_value(sample.get(f["key"]))}
+            for f in fields
         ]
 
     return result
 
 
-def _compute_base_saturation_total(sample):
-    pcts = []
-    for key in ("K%", "Ca%", "Mg%", "Na%"):
-        val = sample.get(key)
-        if val is not None:
-            try:
-                pcts.append(float(val))
-            except (ValueError, TypeError):
-                pass
-    return format_value(sum(pcts)) if pcts else ""
-
-
-def _determine_sar_value(sample, request_code):
-    """Determine which SAR value to use based on request codes."""
+def _determine_sar_value(sample, request_code, config):
     code = (request_code or "").upper()
-    has_s3 = "S3" in code
-    has_s12 = "S12" in code
-
-    if has_s3:
+    if "S3" in code:
         return format_value(sample.get("Paste_SAR"))
-    if has_s12:
+    if "S12" in code:
         return format_value(sample.get("SAR"))
     return ""
 
 
-def prepare_report_context(sample: dict) -> dict:
-    """Transform a raw sample dict into the template context."""
+def prepare_report_context(sample: dict, config: DisciplineConfig) -> dict:
     crop_hort_info = determine_crop_hort(sample)
     request_code = sample.get("Request", "")
-    sections = determine_template_sections(request_code)
+    sections = determine_template_sections(request_code, config)
 
-    rated_keys = ["pH", "EC", "OM", "Nitrate", "P", "K", "Ca", "Mg",
-                  "CEC", "S", "Zn", "Fe", "Mn", "Cu", "B"]
     analytes = {}
-    for key in rated_keys:
-        analytes[key] = _build_analyte(key, sample, crop_hort_info)
+    for key in config.analytes:
+        analytes[key] = _build_analyte(key, sample, config, crop_hort_info)
 
+    for comp in config.computed_recommendations:
+        func = COMPUTATION_REGISTRY.get(comp.computation_type)
+        if func is None:
+            continue
+        if comp.analyte_key in analytes:
+            result = func(sample, comp.params)
+            if isinstance(result, dict):
+                a = analytes[comp.analyte_key]
+                a.unit_conv = format_value(result.get("unit_conv", ""))
+                a.unit_label = result.get("unit", "")
+                if result.get("recommendation", "") != "":
+                    a.recommendation = str(result["recommendation"])
+
+    trigger_results = check_triggers(config, sample)
+
+    heavy_metals_block = config.custom_blocks.get("heavy_metals", [])
     heavy_metals = [
-        {"name": "Arsenic (As)", "value": format_value(sample.get("As"))},
-        {"name": "Cadmium (Cd)", "value": format_value(sample.get("Cd"))},
-        {"name": "Chromium (Cr)", "value": format_value(sample.get("Cr"))},
-        {"name": "Lead (Pb)", "value": format_value(sample.get("Pb"))},
-        {"name": "Molybdenum (Mo)", "value": format_value(sample.get("Mo"))},
-        {"name": "Selenium (Se)", "value": format_value(sample.get("Se"))},
+        {"name": f["name"], "value": format_value(sample.get(f["key"]))}
+        for f in heavy_metals_block
     ]
+
+    base_sat_total = ""
+    for comp in config.computed_recommendations:
+        if comp.computation_type == "base_saturation_sum":
+            func = COMPUTATION_REGISTRY.get(comp.computation_type)
+            if func:
+                base_sat_total = func(sample, comp.params)
+            break
+
+    user_comments = sample.pop("_user_comments", "") or ""
+    user_recs = sample.pop("_user_recommendations", {}) or {}
+
+    for key in list(analytes.keys()):
+        if key in user_recs and user_recs[key].get("value"):
+            analytes[key].recommendation = str(user_recs[key]["value"])
+        if key in user_recs and user_recs[key].get("unit"):
+            analytes[key].rec_unit = user_recs[key]["unit"]
 
     context = {
         "static_path": str(STATIC_DIR.resolve()),
+        "lab": config.lab_info,
         "sample": {
             "lab_id": sample.get("Lab ID"),
             "sample_id": sample.get("Sample ID") or "",
@@ -180,36 +180,47 @@ def prepare_report_context(sample: dict) -> dict:
             "clay": format_value(sample.get("Clay")),
             "texture_class": sample.get("Texture Class") or "",
             "heavy_metals": heavy_metals,
-            "sar": _determine_sar_value(sample, request_code),
-            "show_woodruff": needs_woodruff(sample.get("pH")),
+            "sar": _determine_sar_value(sample, request_code, config),
+            "show_woodruff": trigger_results.get("show_woodruff", False),
             "woodruff_buffer": format_value(sample.get("Woodruff Buffer")),
             "h_pct": format_value(sample.get("H%")),
             "k_pct": format_value(sample.get("K%")),
             "ca_pct": format_value(sample.get("Ca%")),
             "mg_pct": format_value(sample.get("Mg%")),
             "na_pct": format_value(sample.get("Na%")),
-            "base_sat_total": _compute_base_saturation_total(sample),
-            "comments": "",
+            "base_sat_total": base_sat_total,
+            "comments": user_comments,
         },
         "analytes": analytes,
         "sections": sections,
     }
 
-    optional_data = _build_optional_section_data(sample, sections)
+    optional_data = _build_optional_section_data(sample, sections, config)
     context.update(optional_data)
 
     return context
 
 
-def generate_soil_report_pdf(sample: dict, output_path: str | Path) -> Path:
-    """Generate a single soil report PDF."""
-    context = prepare_report_context(sample)
-    template = env.get_template("soil_report.html")
+def generate_report_pdf(sample: dict, config: DisciplineConfig, output_path: str | Path) -> Path:
+    context = prepare_report_context(sample, config)
+
+    if config.template_html:
+        from jinja2 import DictLoader
+        loader = DictLoader({"report.html": config.template_html})
+        macro_loader = FileSystemLoader(str(TEMPLATE_DIR))
+        from jinja2 import ChoiceLoader
+        env = Environment(loader=ChoiceLoader([loader, macro_loader]))
+        template = env.get_template("report.html")
+    else:
+        env = Environment(loader=FileSystemLoader(str(TEMPLATE_DIR)))
+        template = env.get_template("soil_report.html")
+
     html_content = template.render(**context)
 
     output_path = Path(output_path)
     output_path.parent.mkdir(parents=True, exist_ok=True)
 
+    from weasyprint import HTML
     html_doc = HTML(
         string=html_content,
         base_url=str(STATIC_DIR.resolve()),
@@ -218,25 +229,24 @@ def generate_soil_report_pdf(sample: dict, output_path: str | Path) -> Path:
     return output_path
 
 
-def generate_soil_reports_from_spreadsheet(
+def generate_reports_from_spreadsheet(
     spreadsheet_path: str | Path,
     output_dir: str | Path,
+    config: DisciplineConfig,
 ) -> list[dict]:
-    """Parse a spreadsheet and generate PDF reports for all samples.
-
-    Returns a list of result dicts with lab_id, output_path, and status.
-    """
-    samples = parse_soil_spreadsheet(spreadsheet_path)
+    samples = parse_spreadsheet(spreadsheet_path)
     output_dir = Path(output_dir)
     output_dir.mkdir(parents=True, exist_ok=True)
 
     results = []
     for sample in samples:
         lab_id = sample.get("Lab ID", "unknown")
-        output_path = output_dir / f"Report - {lab_id}.pdf"
+        pattern = config.report_filename_pattern
+        filename = pattern.format(lab_id=lab_id)
+        output_path = output_dir / filename
 
         try:
-            generate_soil_report_pdf(sample, output_path)
+            generate_report_pdf(sample, config, output_path)
             results.append({
                 "lab_id": lab_id,
                 "output_path": str(output_path),

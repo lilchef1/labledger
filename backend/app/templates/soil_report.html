@@ -5,679 +5,531 @@
 <style>
 @page {
   size: letter portrait;
-  margin: 0.5in 0.4in 0.5in 0.4in;
+  margin: 0.75in 0.7in 0.75in 0.7in;
 }
-
 body {
   font-family: Calibri, Arial, sans-serif;
-  font-size: 9pt;
+  font-size: 6.5pt;
   color: #000;
   margin: 0;
   padding: 0;
 }
-
-.page-break {
-  page-break-before: always;
-}
-
-/* Header */
-.header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 6px;
-  border-bottom: 3px double #000;
-  padding-bottom: 6px;
-}
-
-.header-logos {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.header-logos img {
-  height: 50px;
-  object-fit: contain;
-}
-
-.header-logos img:first-child {
-  height: 55px;
-}
-
-.header-lab-info {
-  text-align: right;
-  font-size: 8.5pt;
-  line-height: 1.3;
-}
-
-/* Customer and Sample Info */
-.info-row {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 1px;
-}
-
-.info-section {
-  margin-bottom: 8px;
-}
-
-.info-label {
-  font-weight: bold;
-  display: inline;
-}
-
-.customer-info {
-  font-size: 10pt;
-  line-height: 1.4;
-}
-
-.sample-info {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  font-size: 9.5pt;
-  line-height: 1.5;
-  margin-bottom: 8px;
-}
-
-/* Report Table */
-.report-table {
+table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 8.5pt;
-  margin-bottom: 4px;
   table-layout: fixed;
 }
-
-.report-table td, .report-table th {
-  padding: 2px 4px;
-  vertical-align: middle;
-}
-
-/* Section headers */
-.section-header td {
-  font-weight: bold;
-  font-size: 9.5pt;
-  padding-top: 6px;
-  padding-bottom: 2px;
-  border-bottom: 1px solid #999;
-}
-
-/* Rating bar header row */
-.rating-header td {
-  font-size: 7.5pt;
-  text-align: center;
-  color: #555;
+td {
   padding: 1px 2px;
-}
-
-/* Analyte data rows */
-.analyte-row {
-  border-left: 2px solid #000;
-  border-right: 2px solid #000;
-}
-
-.analyte-row td {
-  border-bottom: 1px solid #ddd;
-}
-
-.analyte-name {
-  font-weight: bold;
-  white-space: nowrap;
-}
-
-.analyte-unit {
-  color: #555;
-  text-align: center;
-}
-
-.analyte-result {
-  font-weight: bold;
-  text-align: center;
-}
-
-/* Rating bar cells */
-.rating-cell {
-  text-align: center;
-  font-size: 7pt;
-  color: #666;
-  border-left: 1px solid #eee;
-  word-wrap: break-word;
-}
-
-.rating-cell.active {
-  background-color: #FFC000;
-  color: #000;
-  font-weight: bold;
-}
-
-/* Recommendation column */
-.rec-cell {
-  text-align: center;
-  font-size: 7.5pt;
+  vertical-align: middle;
   overflow: hidden;
-  text-overflow: ellipsis;
 }
-
-.rec-cell.needs-recs {
-  background-color: #FFC000;
+col.cB  { width: 10.5%; }
+col.cC  { width: 8.7%; }
+col.cD  { width: 7.7%; }
+col.cE  { width: 9.8%; }
+col.cF  { width: 6.9%; }
+col.cG  { width: 8.5%; }
+col.cH  { width: 9.4%; }
+col.cI  { width: 9.1%; }
+col.cJ  { width: 7.2%; }
+col.cK  { width: 11.3%; }
+col.cL  { width: 10.9%; }
+.bL { border-left: 2px double #000; }
+.bR { border-right: 2px double #000; }
+.bR-thin { border-right: 1px solid #000; }
+.bLR-thin { border-left: 1px solid #000; border-right: 1px solid #000; }
+.bT-thin { border-top: 1px solid #000; }
+.bB-thin { border-bottom: 1px solid #000; }
+.green-bar td {
+  background: #006600;
+  color: #fff;
   font-weight: bold;
-}
-
-/* Unit conversion column */
-.unit-conv-cell {
-  text-align: center;
-  font-size: 7.5pt;
-}
-
-/* Base saturation row */
-.base-sat-row td {
-  text-align: center;
-  font-size: 8.5pt;
-}
-
-.base-sat-header td {
-  text-align: center;
   font-size: 8pt;
-  font-weight: bold;
-  color: #555;
-}
-
-/* Simple value rows (no rating bar) */
-.simple-row {
-  border-left: 2px solid #000;
-  border-right: 2px solid #000;
-}
-
-.simple-row td {
-  border-bottom: 1px solid #ddd;
-}
-
-/* Optional section blocks */
-.optional-section {
-  margin-top: 4px;
-}
-
-.optional-section .section-title td {
-  font-weight: bold;
-  font-size: 9.5pt;
-  border-bottom: 2px solid #000;
-  border-top: 2px solid #000;
-  padding: 3px 4px;
-}
-
-.optional-section .data-row td {
-  padding: 2px 4px;
-  border-bottom: 1px solid #ddd;
-}
-
-.optional-section .data-row .label {
-  font-weight: bold;
-  min-width: 160px;
-}
-
-.optional-section .data-row .unit {
-  color: #555;
   text-align: center;
-  min-width: 55px;
+  padding: 4px 2px;
+  border-top: 2px double #000;
+  border-bottom: 2px double #000;
 }
-
-.optional-section .data-row .value {
+.section-hdr td {
+  background: #EBF2DF;
   font-weight: bold;
+  font-size: 6.5pt;
   text-align: center;
+  padding: 2px;
+  border-top: 1px solid #000;
+  border-bottom: 1px solid #000;
 }
-
-.optional-section .data-row .interp {
-  text-align: center;
-  font-size: 8pt;
-  color: #555;
-}
-
-/* Footnote */
-.footnote {
-  font-size: 8pt;
-  font-style: italic;
-  margin-top: 6px;
-  border-top: 1px solid #999;
-  padding-top: 3px;
-}
-
-/* Comments */
-.comments-section {
-  margin-top: 8px;
-  border: 1px solid #999;
-  padding: 6px;
-  min-height: 50px;
-}
-
-.comments-label {
-  font-weight: bold;
-  font-size: 9.5pt;
-  margin-bottom: 4px;
-}
-
-.comments-text {
-  font-size: 9pt;
-  white-space: pre-wrap;
-}
+.rlabel { font-size: 6pt; font-weight: bold; text-align: center; }
+.aname { font-weight: bold; text-align: left; padding-left: 4px; }
+.aunit { text-align: center; }
+.aresult { font-weight: bold; text-align: center; }
+.arange { text-align: center; font-size: 6pt; }
+.arec { text-align: center; font-size: 6.5pt; }
+.arec-hdr { text-align: center; font-size: 5.5pt; font-weight: bold; line-height: 1.2; }
+.needs-recs { background: #FFFF00; color: #FF0000; font-weight: bold; }
+.hbar td { padding: 0; height: 6px; }
+.hdr-logo td { padding: 0; border: none; }
+.hdr-info { font-size: 6.5pt; line-height: 1.4; }
+.hdr-lab-info { text-align: right; font-size: 6pt; line-height: 1.4; }
+.footnote { font-size: 6pt; font-style: italic; padding-top: 4px; }
+.comments-box { border: 1px solid #999; padding: 4px; min-height: 40px; margin-top: 4px; }
+.comments-label { font-weight: bold; font-size: 6.5pt; }
+.comments-text { font-size: 6.5pt; white-space: pre-wrap; }
+.page-break-before { page-break-before: always; }
 </style>
 </head>
 <body>
 
-<!-- Header with logos -->
-<div class="header">
-  <div class="header-logos">
-    <img src="{{ static_path }}/images/image1.jpeg" alt="Lab Logo">
-    <img src="{{ static_path }}/images/image2.png" alt="CSU AES">
-    <img src="{{ static_path }}/images/image3.png" alt="CSU Spur">
-  </div>
-  <div class="header-lab-info">
-    4780 National Western Drive<br>
-    Denver, CO 80216<br>
-    Tel: (970) 491-5061<br>
-    Email: soiltestinglab@colostate.edu
-  </div>
-</div>
+{% macro cols() %}
+<colgroup>
+  <col class="cB"><col class="cC"><col class="cD"><col class="cE">
+  <col class="cF"><col class="cG"><col class="cH"><col class="cI"><col class="cJ">
+  <col class="cK"><col class="cL">
+</colgroup>
+{% endmacro %}
 
-<!-- Customer Info -->
-<div class="info-section customer-info">
-  <div>{{ sample.customer_name or '' }}</div>
-  {% if sample.company_name %}<div>{{ sample.company_name }}</div>{% endif %}
-  <div>{{ sample.address or '' }}</div>
-  <div>{{ sample.address_line2 or '' }}</div>
-</div>
+{% macro section_header(text) %}
+<tr class="section-hdr">
+  <td colspan="3" class="bL">{{ text }}</td>
+  <td class="bLR-thin" style="background:#EBF2DF;"></td>
+  <td style="background:#EBF2DF;"></td>
+  <td style="background:#EBF2DF;"></td>
+  <td style="background:#EBF2DF;"></td>
+  <td style="background:#EBF2DF;"></td>
+  <td style="background:#EBF2DF;"></td>
+  <td style="background:#EBF2DF;"></td>
+  <td class="bR" style="background:#EBF2DF;"></td>
+</tr>
+{% endmacro %}
 
-<!-- Sample Info -->
-<div class="sample-info">
-  <div><span class="info-label">Lab ID:</span> {{ sample.lab_id or '' }}</div>
-  <div><span class="info-label">Date Received:</span> {{ sample.date_received or '' }}</div>
-  <div><span class="info-label">Sample ID:</span> {{ sample.sample_id or '' }}</div>
-  <div><span class="info-label">Date Reported:</span> {{ sample.date_reported or '' }}</div>
-  <div><span class="info-label">Soil Depth (in.):</span> {{ sample.soil_depth or '' }}</div>
-</div>
+{% macro simple_row(name, unit, value) %}
+<tr>
+  <td colspan="2" class="bL aname bT-thin bB-thin">{{ name }}</td>
+  <td class="bR-thin aunit bT-thin bB-thin">{{ unit }}</td>
+  <td class="bLR-thin aresult bT-thin bB-thin">{{ value }}</td>
+  <td class="bT-thin bB-thin"></td><td class="bT-thin bB-thin"></td><td class="bT-thin bB-thin"></td>
+  <td class="bT-thin bB-thin"></td><td class="bT-thin bB-thin"></td><td class="bT-thin bB-thin"></td>
+  <td class="bR bT-thin bB-thin"></td>
+</tr>
+{% endmacro %}
 
-<!-- Main Report Table -->
-<table class="report-table">
-  <colgroup>
-    <col style="width: 17%"><!-- Analyte name -->
-    <col style="width: 6%"><!-- Units -->
-    <col style="width: 5%"><!-- Results -->
-    <col style="width: 8.5%"><!-- Rating 1 -->
-    <col style="width: 8.5%"><!-- Rating 2 -->
-    <col style="width: 8.5%"><!-- Rating 3 -->
-    <col style="width: 8.5%"><!-- Rating 4 -->
-    <col style="width: 8.5%"><!-- Rating 5 -->
-    <col style="width: 8.5%"><!-- Rating 6 -->
-    <col style="width: 7%"><!-- Unit conv -->
-    <col style="width: 13.5%"><!-- Recommendation -->
-  </colgroup>
+{% macro rated_block(analyte, name, unit, rec_unit=None, unit_conv_label=None, section_name=None) %}
+{% set num = analyte.labels|length %}
+{% set has_rec = rec_unit is not none %}
+{% set has_ucl = unit_conv_label is not none %}
+{% set padding = 7 - num - (1 if has_rec else 0) - (1 if has_ucl else 0) %}
+{% set ns = namespace(pos=0) %}
+<tr>
+  <td rowspan="3" colspan="2" class="bL aname bT-thin">{% if section_name %}{{ section_name }}<br>{% endif %}{{ name }}</td>
+  <td rowspan="3" class="bR-thin aunit bT-thin">{{ unit }}</td>
+  <td rowspan="3" class="bLR-thin aresult bT-thin">{{ analyte.display }}</td>
+  {% for label, range_text in analyte.labels %}
+  {% set ns.pos = ns.pos + 1 %}
+  <td class="rlabel bT-thin{% if ns.pos == 7 %} bR{% endif %}">{{ label }}</td>
+  {% endfor %}
+  {% for _ in range(padding) %}
+  {% set ns.pos = ns.pos + 1 %}
+  <td class="bT-thin{% if ns.pos == 7 %} bR{% endif %}"></td>
+  {% endfor %}
+  {% if has_ucl %}
+  {% set ns.pos = ns.pos + 1 %}
+  <td class="rlabel bT-thin{% if ns.pos == 7 %} bR{% endif %}">{{ unit_conv_label }}</td>
+  {% endif %}
+  {% if has_rec %}
+  <td class="arec-hdr bR bT-thin">Recommendation<br>{{ rec_unit }}</td>
+  {% endif %}
+</tr>
+{% set ns2 = namespace(pos=0) %}
+<tr>
+  {% for label, range_text in analyte.labels %}
+  {% set ns2.pos = ns2.pos + 1 %}
+  <td class="arange{% if ns2.pos == 7 %} bR{% endif %}">{{ range_text }}</td>
+  {% endfor %}
+  {% for _ in range(padding) %}
+  {% set ns2.pos = ns2.pos + 1 %}
+  <td{% if ns2.pos == 7 %} class="bR"{% endif %}></td>
+  {% endfor %}
+  {% if has_ucl %}
+  {% set ns2.pos = ns2.pos + 1 %}
+  <td class="arec{% if ns2.pos == 7 %} bR{% endif %}">{{ analyte.unit_conv or '' }}</td>
+  {% endif %}
+  {% if has_rec %}
+  <td class="arec bR{% if analyte.recommendation == 'Needs Recs' %} needs-recs{% endif %}">{{ analyte.recommendation or '' }}</td>
+  {% endif %}
+</tr>
+<tr class="hbar">
+  {% for i in range(7) %}
+  <td class="bB-thin{% if i == 6 %} bR{% endif %}"{% if i < num and analyte.active_index is not none and analyte.active_index == i %} style="background:{{ analyte.color }};"{% endif %}></td>
+  {% endfor %}
+</tr>
+{% endmacro %}
 
-  <!-- Column headers -->
-  <tr class="section-header">
-    <td>Soil Analysis</td>
-    <td style="text-align:center">Units</td>
-    <td style="text-align:center">Results</td>
-    <td colspan="6" style="text-align:center">Test Rating*</td>
-    <td></td>
-    <td></td>
-  </tr>
 
-  <!-- pH -->
-  {% set ph = analytes.pH %}
-  <tr class="rating-header">
-    <td></td><td></td><td></td>
-    {% for label, range_text in ph.labels %}
-    <td>{{ label }}</td>
-    {% endfor %}
-    <td></td><td></td>
-  </tr>
-  <tr class="analyte-row">
-    <td class="analyte-name">1:1 Soil pH</td>
-    <td class="analyte-unit"></td>
-    <td class="analyte-result">{{ ph.display }}</td>
-    {% for label, range_text in ph.labels %}
-    <td class="rating-cell{% if ph.active_index == loop.index0 %} active{% endif %}">{{ range_text }}</td>
-    {% endfor %}
-    <td></td><td></td>
-  </tr>
+<table>
+  {{ cols() }}
 
-  <!-- Woodruff Buffer (conditional) -->
+  <thead>
+    <tr class="hdr-logo">
+      <td colspan="3" style="padding:8px 0;vertical-align:middle;">
+        <img src="{{ static_path }}/images/csu_aes.png" alt="CSU AES" style="height:70px;">
+      </td>
+      <td colspan="5" style="padding:8px 0;text-align:center;vertical-align:middle;">
+        <img src="{{ static_path }}/images/csu_spur.png" alt="CSU Spur" style="height:60px;">
+      </td>
+      <td colspan="3" style="padding:8px 0;text-align:right;vertical-align:middle;">
+        <img src="{{ static_path }}/images/image1.jpeg" alt="Lab Logo" style="max-height:80px;max-width:100%;">
+      </td>
+    </tr>
+
+    <tr class="hdr-info">
+      <td colspan="5" style="vertical-align:top;line-height:1.6;padding-top:2px;padding-bottom:8px;">
+        {{ sample.customer_name or '' }}<br>
+        {% if sample.company_name %}{{ sample.company_name }}<br>{% endif %}
+        {{ sample.address or '' }}<br>
+        {{ sample.address_line2 or '' }}
+      </td>
+      <td colspan="4"></td>
+      <td colspan="2" class="hdr-lab-info" style="vertical-align:top;padding-top:6px;">
+        4780 National Western Drive<br>
+        Denver, CO 80216<br>
+        Tel: (970) 491-5061<br>
+        Email: soiltestinglab@colostate.edu
+      </td>
+    </tr>
+
+    <tr class="hdr-info">
+      <td style="font-weight:bold;">Lab ID:</td>
+      <td>{{ sample.lab_id or '' }}</td>
+      <td colspan="7"></td>
+      <td style="text-align:right;font-weight:bold;">Date Received:</td>
+      <td style="text-align:right;">{{ sample.date_received or '' }}</td>
+    </tr>
+    <tr class="hdr-info">
+      <td style="font-weight:bold;">Sample ID:</td>
+      <td>{{ sample.sample_id or '' }}</td>
+      <td colspan="7"></td>
+      <td style="text-align:right;font-weight:bold;">Date Reported:</td>
+      <td style="text-align:right;">{{ sample.date_reported or '' }}</td>
+    </tr>
+    <tr class="hdr-info">
+      <td colspan="2" style="font-weight:bold;">Soil Depth (in.):&nbsp; {{ sample.soil_depth or '' }}</td>
+      <td colspan="9"></td>
+    </tr>
+
+    <tr class="green-bar">
+      <td colspan="2" class="bL" style="text-align:left;padding-left:4px;">Soil Analysis</td>
+      <td class="bR-thin">Units</td>
+      <td class="bLR-thin">Results</td>
+      <td colspan="7" class="bR">Test Rating*</td>
+    </tr>
+  </thead>
+
+  <tbody>
+  {{ rated_block(analytes.pH, "1:1 Soil pH", "") }}
+  </tbody>
+
   {% if sample.show_woodruff %}
-  <tr class="analyte-row">
-    <td class="analyte-name">Woodruff Buffer pH</td>
-    <td class="analyte-unit"></td>
-    <td class="analyte-result">{{ sample.woodruff_buffer or '' }}</td>
-    <td colspan="7"></td>
-    <td></td>
+  <tbody>
+  <tr>
+    <td colspan="2" class="bL aname bT-thin bB-thin">Woodruff Buffer pH</td>
+    <td class="bR-thin bT-thin bB-thin"></td>
+    <td class="bLR-thin aresult bT-thin bB-thin">{{ sample.woodruff_buffer or '' }}</td>
+    <td class="bT-thin bB-thin"></td><td class="bT-thin bB-thin"></td><td class="bT-thin bB-thin"></td>
+    <td class="bT-thin bB-thin"></td><td class="bT-thin bB-thin"></td><td class="bT-thin bB-thin"></td>
+    <td class="bR bT-thin bB-thin"></td>
   </tr>
+  </tbody>
   {% endif %}
 
-  <!-- EC -->
-  {% set ec = analytes.EC %}
-  <tr class="rating-header">
-    <td></td><td></td><td></td>
-    {% for label, range_text in ec.labels %}
-    <td>{{ label }}</td>
-    {% endfor %}
-    <td></td><td></td>
-  </tr>
-  <tr class="analyte-row">
-    <td class="analyte-name">1:1 Soluble Salts (EC)</td>
-    <td class="analyte-unit">mmho/cm</td>
-    <td class="analyte-result">{{ ec.display }}</td>
-    {% for label, range_text in ec.labels %}
-    <td class="rating-cell{% if ec.active_index == loop.index0 %} active{% endif %}">{{ range_text }}</td>
-    {% endfor %}
-    <td></td><td></td>
-  </tr>
+  <tbody>
+  {{ rated_block(analytes.EC, "1:1 Soluble Salts (EC)", "mmho/cm") }}
+  </tbody>
 
-  <!-- Excess Lime -->
-  <tr class="simple-row">
-    <td class="analyte-name">Excess Lime</td>
-    <td class="analyte-unit"></td>
-    <td class="analyte-result">{{ sample.lime or '' }}</td>
-    <td colspan="6"></td>
-    <td></td><td></td>
-  </tr>
+  <tbody>
+  {{ simple_row("Excess Lime", "", sample.lime or '') }}
+  </tbody>
 
-  <!-- Organic Matter -->
-  {% set om = analytes.OM %}
-  <tr class="rating-header">
-    <td></td><td></td><td></td>
-    {% for label, range_text in om.labels %}
-    <td>{{ label }}</td>
-    {% endfor %}
-    {% if om.labels|length < 6 %}<td></td>{% endif %}
-    <td></td><td></td>
-  </tr>
-  <tr class="analyte-row">
-    <td class="analyte-name">Organic Matter LOI</td>
-    <td class="analyte-unit">%</td>
-    <td class="analyte-result">{{ om.display }}</td>
-    {% for label, range_text in om.labels %}
-    <td class="rating-cell{% if om.active_index == loop.index0 %} active{% endif %}">{{ range_text }}</td>
-    {% endfor %}
-    {% if om.labels|length < 6 %}<td></td>{% endif %}
-    <td></td><td></td>
-  </tr>
+  <tbody>
+  {{ rated_block(analytes.OM, "Organic Matter LOI", "%") }}
+  </tbody>
 
-  <!-- Macro to render a standard rated analyte row -->
-  {% macro rated_row(analyte, name, unit, section_header=None, header_labels=None) %}
-  {% if section_header %}
-  <tr class="section-header"><td colspan="11">{{ section_header }}</td></tr>
-  {% endif %}
-  {% if header_labels %}
-  <tr class="rating-header">
-    <td></td><td></td><td></td>
-    {% for hl in header_labels %}
-    <td>{{ hl }}</td>
-    {% endfor %}
-    <td>{{ analyte.unit_label or '' }}</td>
-    <td>Recommendation {{ analyte.rec_unit or '' }}</td>
-  </tr>
-  {% endif %}
-  <tr class="analyte-row">
-    <td class="analyte-name">{{ name }}</td>
-    <td class="analyte-unit">{{ unit }}</td>
-    <td class="analyte-result">{{ analyte.display }}</td>
-    {% for label, range_text in analyte.labels %}
-    <td class="rating-cell{% if analyte.active_index == loop.index0 %} active{% endif %}">{{ range_text }}</td>
-    {% endfor %}
-    {% if analyte.labels|length < 6 %}<td></td>{% endif %}
-    <td class="unit-conv-cell">{{ analyte.unit_conv or '' }}</td>
-    <td class="rec-cell{% if analyte.recommendation == 'Needs Recs' %} needs-recs{% endif %}">{{ analyte.recommendation or '' }}</td>
-  </tr>
-  {% endmacro %}
+  <tbody>
+  {{ rated_block(analytes.Nitrate, "KCl Nitrate-N", "ppm", rec_unit=analytes.Nitrate.rec_unit, unit_conv_label=analytes.Nitrate.rec_unit) }}
+  </tbody>
 
-  <!-- KCl Nitrate-N -->
-  {{ rated_row(analytes.Nitrate, "KCl Nitrate-N", "ppm",
-     header_labels=["Very Low", "Low", "Medium", "High", "Very High"]) }}
+  <tbody>
+  {{ rated_block(analytes.P, "Phosphorus (P)", "ppm", rec_unit=analytes.P.rec_unit, section_name="Olsen Bicarbonate") }}
+  </tbody>
 
-  <!-- Olsen Bicarbonate Phosphorus -->
-  <tr class="section-header"><td colspan="11">Olsen Bicarbonate</td></tr>
-  {{ rated_row(analytes.P, "Phosphorus (P)", "ppm",
-     header_labels=["Very Low", "Low", "Medium", "Optimum", "High", "Very High"]) }}
+  <tbody>
+  {{ section_header("Ammonium Acetate") }}
+  </tbody>
 
-  <!-- Ammonium Acetate section -->
-  <tr class="section-header"><td colspan="11">Ammonium Acetate</td></tr>
-  <tr class="rating-header">
-    <td></td><td></td><td></td>
-    <td>Very Low</td><td>Low</td><td>Medium</td><td>Optimum</td><td>High</td><td>Very High</td>
-    <td></td><td>Recommendation {{ analytes.K.rec_unit or '' }}</td>
-  </tr>
-  {{ rated_row(analytes.K, "Potassium (K)", "ppm") }}
-  {{ rated_row(analytes.Ca, "Calcium (Ca)", "ppm") }}
-  {{ rated_row(analytes.Mg, "Magnesium (Mg)", "ppm") }}
+  <tbody>
+  {{ rated_block(analytes.K, "Potassium (K)", "ppm", rec_unit=analytes.K.rec_unit) }}
+  </tbody>
 
-  <!-- Sodium (no rating bar) -->
-  <tr class="simple-row">
-    <td class="analyte-name">Sodium (Na)</td>
-    <td class="analyte-unit">ppm</td>
-    <td class="analyte-result">{{ sample.na or '' }}</td>
-    <td colspan="6"></td>
-    <td></td><td></td>
-  </tr>
+  <tbody>
+  {{ rated_block(analytes.Ca, "Calcium (Ca)", "ppm", rec_unit=analytes.Ca.rec_unit) }}
+  </tbody>
 
-  <!-- CEC -->
+  <tbody>
+  {{ rated_block(analytes.Mg, "Magnesium (Mg)", "ppm", rec_unit=analytes.Mg.rec_unit) }}
+  </tbody>
+
+  <tbody>
+  {{ simple_row("Sodium (Na)", "ppm", sample.na or '') }}
+  </tbody>
+
+  <tbody>
   {% set cec = analytes.CEC %}
-  <tr class="analyte-row">
-    <td class="analyte-name">Cation Exchange Capacity (CEC)<br><span style="font-weight:normal;font-size:8pt">or Sum of Cations</span></td>
-    <td class="analyte-unit">meq/100g</td>
-    <td class="analyte-result">{{ cec.display }}</td>
+  <tr>
+    <td rowspan="3" colspan="2" class="bL aname bT-thin">Cation Exchange Capacity (CEC)<br>or Sum of Cations</td>
+    <td rowspan="3" class="bR-thin aunit bT-thin">meq/100g</td>
+    <td rowspan="3" class="bLR-thin aresult bT-thin">{{ cec.display }}</td>
     {% for label, range_text in cec.labels %}
-    <td class="rating-cell{% if cec.active_index == loop.index0 %} active{% endif %}"><span style="font-size:7pt">{{ label }}</span><br>{{ range_text }}</td>
+    <td class="rlabel bT-thin" style="font-style:italic;">{{ label }}</td>
     {% endfor %}
-    {% if cec.labels|length < 6 %}<td></td>{% endif %}
-    <td></td><td></td>
+    {% for _ in range(7 - cec.labels|length) %}
+    <td class="bT-thin{% if loop.last %} bR{% endif %}"></td>
+    {% endfor %}
   </tr>
-
-  <!-- Base Saturation -->
-  <tr class="base-sat-header">
-    <td></td><td></td><td></td>
-    <td>H</td><td>K</td><td>Ca</td><td>Mg</td><td>Na</td>
-    <td></td><td></td><td></td>
+  <tr>
+    {% for label, range_text in cec.labels %}
+    <td class="arange">{{ range_text }}</td>
+    {% endfor %}
+    {% for _ in range(7 - cec.labels|length) %}
+    <td{% if loop.last %} class="bR"{% endif %}></td>
+    {% endfor %}
   </tr>
-  <tr class="analyte-row base-sat-row">
-    <td class="analyte-name">Base Saturation</td>
-    <td class="analyte-unit">%</td>
-    <td class="analyte-result">{{ sample.base_sat_total or '' }}</td>
-    <td>{{ sample.h_pct or '' }}</td>
-    <td>{{ sample.k_pct or '' }}</td>
-    <td>{{ sample.ca_pct or '' }}</td>
-    <td>{{ sample.mg_pct or '' }}</td>
-    <td>{{ sample.na_pct or '' }}</td>
-    <td></td><td></td><td></td>
+  <tr class="hbar">
+    {% for i in range(7) %}
+    <td class="bB-thin{% if i == 6 %} bR{% endif %}"{% if i < cec.labels|length and cec.active_index is not none and cec.active_index == i %} style="background:{{ cec.color }};"{% endif %}></td>
+    {% endfor %}
   </tr>
+  </tbody>
 
-  <!-- Ca-P / Sulfate -->
-  <tr class="section-header"><td colspan="11">Ca-P</td></tr>
-  {{ rated_row(analytes.S, "Sulfate-S", "ppm",
-     header_labels=["Very Low", "Low", "Medium", "Optimum", "High"]) }}
-
-</table>
-
-<!-- Page break: matches Excel row 54 -->
-<div class="page-break"></div>
-
-<table class="report-table">
-  <colgroup>
-    <col style="width: 17%">
-    <col style="width: 6%">
-    <col style="width: 5%">
-    <col style="width: 8.5%">
-    <col style="width: 8.5%">
-    <col style="width: 8.5%">
-    <col style="width: 8.5%">
-    <col style="width: 8.5%">
-    <col style="width: 8.5%">
-    <col style="width: 7%">
-    <col style="width: 13.5%">
-  </colgroup>
-
-  <!-- DTPA Micronutrients -->
-  <tr class="section-header"><td colspan="11">DTPA</td></tr>
-  <tr class="rating-header">
-    <td></td><td></td><td></td>
-    <td>Very Low</td><td>Low</td><td>Medium</td><td>Optimum</td><td>High</td><td>Very High</td>
-    <td></td><td>Recommendation {{ analytes.Zn.rec_unit or '' }}</td>
+  <tbody>
+  <tr>
+    <td rowspan="3" colspan="2" class="bL aname bT-thin">Base Saturation</td>
+    <td rowspan="3" class="bR-thin aunit bT-thin">%</td>
+    <td rowspan="3" class="bLR-thin aresult bT-thin">{{ sample.base_sat_total or '' }}</td>
+    <td class="rlabel bT-thin">H</td>
+    <td class="rlabel bT-thin">K</td>
+    <td class="rlabel bT-thin">Ca</td>
+    <td class="rlabel bT-thin">Mg</td>
+    <td class="rlabel bT-thin">Na</td>
+    <td class="bT-thin"></td>
+    <td class="bR bT-thin"></td>
   </tr>
-  {{ rated_row(analytes.Zn, "Zinc (Zn)", "ppm") }}
-  {{ rated_row(analytes.Fe, "Iron (Fe)", "ppm") }}
-  {{ rated_row(analytes.Mn, "Manganese (Mn)", "ppm") }}
-  {{ rated_row(analytes.Cu, "Copper (Cu)", "ppm") }}
+  <tr>
+    <td class="arange">{{ sample.h_pct or '' }}</td>
+    <td class="arange">{{ sample.k_pct or '' }}</td>
+    <td class="arange">{{ sample.ca_pct or '' }}</td>
+    <td class="arange">{{ sample.mg_pct or '' }}</td>
+    <td class="arange">{{ sample.na_pct or '' }}</td>
+    <td></td>
+    <td class="bR"></td>
+  </tr>
+  <tr class="hbar">
+    <td class="bB-thin"></td><td class="bB-thin"></td><td class="bB-thin"></td>
+    <td class="bB-thin"></td><td class="bB-thin"></td><td class="bB-thin"></td>
+    <td class="bR bB-thin"></td>
+  </tr>
+  </tbody>
 
-  <!-- Hot Water Extraction / Boron -->
-  <tr class="section-header"><td colspan="11">Hot Water Extraction</td></tr>
-  {{ rated_row(analytes.B, "Boron (B)", "ppm",
-     header_labels=["Very Low", "Low", "Medium", "Optimum", "High", "Very High"]) }}
+  <tbody>
+  {{ section_header("Ca-P") }}
+  </tbody>
 
-  <!-- Calcium Nitrate / Chloride -->
-  <tr class="section-header"><td colspan="11">Calcium Nitrate</td></tr>
-  <tr class="simple-row">
-    <td class="analyte-name">Chloride (Cl)</td>
-    <td class="analyte-unit">ppm</td>
-    <td class="analyte-result">{{ sample.cl or '' }}</td>
-    <td colspan="6"></td>
-    <td></td><td></td>
-  </tr>
+  <tbody>
+  {{ rated_block(analytes.S, "Sulfate-S", "ppm", rec_unit=analytes.S.rec_unit) }}
+  </tbody>
 
-  <!-- Soil Texture -->
-  <tr class="section-header"><td colspan="11">Soil Texture</td></tr>
-  <tr class="simple-row">
-    <td class="analyte-name">% Sand</td>
-    <td class="analyte-unit">%</td>
-    <td class="analyte-result">{{ sample.sand or '' }}</td>
-    <td colspan="6"></td><td></td><td></td>
-  </tr>
-  <tr class="simple-row">
-    <td class="analyte-name">% Silt</td>
-    <td class="analyte-unit">%</td>
-    <td class="analyte-result">{{ sample.silt or '' }}</td>
-    <td colspan="6"></td><td></td><td></td>
-  </tr>
-  <tr class="simple-row">
-    <td class="analyte-name">% Clay</td>
-    <td class="analyte-unit">%</td>
-    <td class="analyte-result">{{ sample.clay or '' }}</td>
-    <td colspan="6"></td><td></td><td></td>
-  </tr>
-  <tr class="simple-row">
-    <td class="analyte-name">Texture by Hydrometer</td>
-    <td class="analyte-unit"></td>
-    <td class="analyte-result">{{ sample.texture_class or '' }}</td>
-    <td colspan="6"></td><td></td><td></td>
-  </tr>
+  <tbody class="page-break-before">
+  {{ section_header("DTPA") }}
+  </tbody>
 
-  <!-- Heavy Metals -->
-  <tr class="section-header"><td colspan="11">Heavy Metals</td></tr>
+  <tbody>
+  {{ rated_block(analytes.Zn, "Zinc (Zn)", "ppm", rec_unit=analytes.Zn.rec_unit) }}
+  </tbody>
+
+  <tbody>
+  {{ rated_block(analytes.Fe, "Iron (Fe)", "ppm", rec_unit=analytes.Fe.rec_unit) }}
+  </tbody>
+
+  <tbody>
+  {{ rated_block(analytes.Mn, "Manganese (Mn)", "ppm", rec_unit=analytes.Mn.rec_unit) }}
+  </tbody>
+
+  <tbody>
+  {{ rated_block(analytes.Cu, "Copper (Cu)", "ppm", rec_unit=analytes.Cu.rec_unit) }}
+  </tbody>
+
+  <tbody>
+  {{ section_header("Hot Water Extraction") }}
+  </tbody>
+
+  <tbody>
+  {{ rated_block(analytes.B, "Boron (B)", "ppm", rec_unit=analytes.B.rec_unit) }}
+  </tbody>
+
+  <tbody>
+  {{ section_header("Calcium Nitrate") }}
+  {{ simple_row("Chloride (Cl)", "ppm", sample.cl or '') }}
+  </tbody>
+
+  <tbody>
+  {{ section_header("Soil Texture") }}
+  <tr>
+    <td colspan="2" class="bL aname">% Sand</td>
+    <td class="bR-thin aunit">%</td>
+    <td class="bLR-thin aresult">{{ sample.sand or '' }}</td>
+    <td></td><td></td><td></td><td></td><td></td><td></td>
+    <td class="bR"></td>
+  </tr>
+  <tr>
+    <td colspan="2" class="bL aname">% Silt</td>
+    <td class="bR-thin aunit">%</td>
+    <td class="bLR-thin aresult">{{ sample.silt or '' }}</td>
+    <td></td><td></td><td></td><td></td><td></td><td></td>
+    <td class="bR"></td>
+  </tr>
+  <tr>
+    <td colspan="2" class="bL aname">% Clay</td>
+    <td class="bR-thin aunit">%</td>
+    <td class="bLR-thin aresult">{{ sample.clay or '' }}</td>
+    <td></td><td></td><td></td><td></td><td></td><td></td>
+    <td class="bR"></td>
+  </tr>
+  <tr>
+    <td colspan="2" class="bL aname bB-thin">Texture by Hydrometer</td>
+    <td class="bR-thin bB-thin"></td>
+    <td class="bLR-thin aresult bB-thin">{{ sample.texture_class or '' }}</td>
+    <td class="bB-thin"></td><td class="bB-thin"></td><td class="bB-thin"></td>
+    <td class="bB-thin"></td><td class="bB-thin"></td><td class="bB-thin"></td>
+    <td class="bR bB-thin"></td>
+  </tr>
+  </tbody>
+
+  <tbody>
+  {{ section_header("Heavy Metals") }}
   {% for metal in sample.heavy_metals %}
-  <tr class="simple-row">
-    <td class="analyte-name">{{ metal.name }}</td>
-    <td class="analyte-unit">ppm</td>
-    <td class="analyte-result">{{ metal.value or '' }}</td>
-    <td colspan="6"></td><td></td><td></td>
+  <tr>
+    <td colspan="2" class="bL aname">{{ metal.name }}</td>
+    <td class="bR-thin aunit">ppm</td>
+    <td class="bLR-thin aresult">{{ metal.value or '' }}</td>
+    <td></td><td></td><td></td><td></td><td></td><td></td>
+    <td class="bR"></td>
   </tr>
   {% endfor %}
+  </tbody>
 
-  <!-- SAR -->
-  <tr class="section-header"><td colspan="11">Sodium Absorption Ratio</td></tr>
-  <tr class="simple-row">
-    <td class="analyte-name">SAR</td>
-    <td class="analyte-unit"></td>
-    <td class="analyte-result">{{ sample.sar or '' }}</td>
-    <td colspan="6"></td><td></td><td></td>
+  <tbody>
+  {{ section_header("Sodium Absorption Ratio") }}
+  <tr>
+    <td colspan="2" class="bL aname" style="border-bottom:2px double #000;">SAR</td>
+    <td class="bR-thin" style="border-bottom:2px double #000;"></td>
+    <td class="bLR-thin aresult" style="border-bottom:2px double #000;">{{ sample.sar or '' }}</td>
+    <td style="border-bottom:2px double #000;"></td>
+    <td style="border-bottom:2px double #000;"></td>
+    <td style="border-bottom:2px double #000;"></td>
+    <td style="border-bottom:2px double #000;"></td>
+    <td style="border-bottom:2px double #000;"></td>
+    <td style="border-bottom:2px double #000;"></td>
+    <td class="bR" style="border-bottom:2px double #000;"></td>
   </tr>
+  </tbody>
+
+  {% if "sar_paste" in sections %}
+  <tbody>
+  {{ section_header("Saturated Soil Paste Analysis") }}
+  {% for row in sar_paste_data %}
+  <tr>
+    <td colspan="2" class="bL aname bT-thin bB-thin">{{ row.name }}</td>
+    <td class="bR-thin aunit bT-thin bB-thin">{{ row.unit }}</td>
+    <td class="bLR-thin aresult bT-thin bB-thin">{{ row.value }}</td>
+    <td class="bT-thin bB-thin"></td><td class="bT-thin bB-thin"></td><td class="bT-thin bB-thin"></td>
+    <td class="bT-thin bB-thin"></td><td class="bT-thin bB-thin"></td>
+    <td class="bT-thin bB-thin arange">{{ row.optimum }}</td>
+    <td class="bR bT-thin bB-thin"></td>
+  </tr>
+  {% endfor %}
+  </tbody>
+  {% endif %}
+
+  {% if "carbon_nitrogen" in sections %}
+  <tbody>
+  {{ section_header("Carbon and Nitrogen") }}
+  {% for row in cn_data %}
+  <tr>
+    <td colspan="2" class="bL aname bT-thin bB-thin">{{ row.name }}</td>
+    <td class="bR-thin aunit bT-thin bB-thin">{{ row.unit }}</td>
+    <td class="bLR-thin aresult bT-thin bB-thin">{{ row.value }}</td>
+    <td class="bT-thin bB-thin"></td><td class="bT-thin bB-thin"></td><td class="bT-thin bB-thin"></td>
+    <td class="bT-thin bB-thin"></td><td class="bT-thin bB-thin"></td><td class="bT-thin bB-thin"></td>
+    <td class="bR bT-thin bB-thin"></td>
+  </tr>
+  {% endfor %}
+  </tbody>
+  {% endif %}
+
+  {% if "mineralization" in sections %}
+  <tbody>
+  {{ section_header("28-Day Mineralizable Nitrogen") }}
+  {% for row in mineralization_data %}
+  <tr>
+    <td colspan="2" class="bL aname bT-thin bB-thin">{{ row.name }}</td>
+    <td class="bR-thin aunit bT-thin bB-thin">{{ row.unit }}</td>
+    <td class="bLR-thin aresult bT-thin bB-thin">{{ row.value }}</td>
+    <td class="bT-thin bB-thin"></td><td class="bT-thin bB-thin"></td><td class="bT-thin bB-thin"></td>
+    <td class="bT-thin bB-thin"></td><td class="bT-thin bB-thin"></td><td class="bT-thin bB-thin"></td>
+    <td class="bR bT-thin bB-thin"></td>
+  </tr>
+  {% endfor %}
+  </tbody>
+  {% endif %}
+
+  {% if "wsa" in sections %}
+  <tbody>
+  {{ section_header("Wet Aggregate Stability") }}
+  {% for row in wsa_data %}
+  <tr>
+    <td colspan="2" class="bL aname bT-thin bB-thin">{{ row.name }}</td>
+    <td class="bR-thin aunit bT-thin bB-thin">{{ row.unit }}</td>
+    <td class="bLR-thin aresult bT-thin bB-thin">{{ row.value }}</td>
+    <td class="bT-thin bB-thin"></td><td class="bT-thin bB-thin"></td><td class="bT-thin bB-thin"></td>
+    <td class="bT-thin bB-thin"></td><td class="bT-thin bB-thin"></td><td class="bT-thin bB-thin"></td>
+    <td class="bR bT-thin bB-thin"></td>
+  </tr>
+  {% endfor %}
+  </tbody>
+  {% endif %}
+
+  {% if "paw" in sections %}
+  <tbody>
+  {{ section_header("Plant Available Water") }}
+  {% for row in paw_data %}
+  <tr>
+    <td colspan="2" class="bL aname bT-thin bB-thin">{{ row.name }}</td>
+    <td class="bR-thin aunit bT-thin bB-thin">{{ row.unit }}</td>
+    <td class="bLR-thin aresult bT-thin bB-thin">{{ row.value }}</td>
+    <td class="bT-thin bB-thin"></td><td class="bT-thin bB-thin"></td><td class="bT-thin bB-thin"></td>
+    <td class="bT-thin bB-thin"></td><td class="bT-thin bB-thin"></td><td class="bT-thin bB-thin"></td>
+    <td class="bR bT-thin bB-thin"></td>
+  </tr>
+  {% endfor %}
+  </tbody>
+  {% endif %}
+
 </table>
 
-<!-- Optional Sections -->
-{% if "sar_paste" in sections %}
-<div class="optional-section">
-  <table class="report-table">
-    <tr class="section-title"><td colspan="4">Saturated Soil Paste Analysis</td><td colspan="2" style="text-align:center;font-weight:bold">Interpretations</td><td style="text-align:center;font-weight:bold">Optimum Levels (ppm)</td></tr>
-    {% for item in sar_paste_data %}
-    <tr class="data-row">
-      <td class="label">{{ item.name }}</td>
-      <td class="unit">{{ item.unit }}</td>
-      <td class="value">{{ item.value or '' }}</td>
-      <td colspan="3"></td>
-      <td class="interp">{{ item.optimum or '' }}</td>
-    </tr>
-    {% endfor %}
-  </table>
-</div>
-{% endif %}
-
-{% if "carbon_nitrogen" in sections %}
-<div class="optional-section">
-  <table class="report-table">
-    <tr class="section-title"><td colspan="4">Carbon and Nitrogen</td></tr>
-    {% for item in cn_data %}
-    <tr class="data-row">
-      <td class="label">{{ item.name }}</td>
-      <td class="unit">{{ item.unit }}</td>
-      <td class="value">{{ item.value or '' }}</td>
-      <td></td>
-    </tr>
-    {% endfor %}
-  </table>
-</div>
-{% endif %}
-
-{% if "paw" in sections %}
-<div class="optional-section">
-  <table class="report-table">
-    <tr class="section-title"><td colspan="4">Plant Available Water</td></tr>
-    {% for item in paw_data %}
-    <tr class="data-row">
-      <td class="label">{{ item.name }}</td>
-      <td class="unit">{{ item.unit }}</td>
-      <td class="value">{{ item.value or '' }}</td>
-      <td></td>
-    </tr>
-    {% endfor %}
-  </table>
-</div>
-{% endif %}
-
-{% if "wsa" in sections %}
-<div class="optional-section">
-  <table class="report-table">
-    <tr class="section-title"><td colspan="4">Wet Aggregate Stability</td></tr>
-    {% for item in wsa_data %}
-    <tr class="data-row">
-      <td class="label">{{ item.name }}</td>
-      <td class="unit">{{ item.unit }}</td>
-      <td class="value">{{ item.value or '' }}</td>
-      <td></td>
-    </tr>
-    {% endfor %}
-  </table>
-</div>
-{% endif %}
-
-{% if "mineralization" in sections %}
-<div class="optional-section">
-  <table class="report-table">
-    <tr class="section-title"><td colspan="4">28-Day Mineralizable Nitrogen</td></tr>
-    {% for item in mineralization_data %}
-    <tr class="data-row">
-      <td class="label">{{ item.name }}</td>
-      <td class="unit">{{ item.unit }}</td>
-      <td class="value">{{ item.value or '' }}</td>
-      <td></td>
-    </tr>
-    {% endfor %}
-  </table>
-</div>
-{% endif %}
-
-<!-- Footnote -->
 <div class="footnote">
   *Test ratings are provided for general crop production. The ranges may be different for individual crops or for specific situations.
 </div>
 
-<!-- Comments -->
-<div class="comments-section">
+<div class="comments-box">
   <div class="comments-label">Comments:</div>
   <div class="comments-text">{{ sample.comments or '' }}</div>
 </div>

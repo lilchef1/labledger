@@ -1,12 +1,23 @@
+from contextlib import asynccontextmanager
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.routers import reports
+from app.services.database import init_db
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    init_db()
+    yield
+
 
 app = FastAPI(
     title="LabLedger",
-    version="0.1.0",
+    version="0.2.0",
     description="Lab information management system",
+    lifespan=lifespan,
 )
 
 app.add_middleware(
