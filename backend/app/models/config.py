@@ -38,6 +38,7 @@ class Discipline(Base):
     green_bar_title = Column(String, nullable=False)
     spreadsheet_id_prefix = Column(String, default="")
     report_filename_pattern = Column(String, default="Report - {lab_id}.pdf")
+    fallback_behavior_json = Column(JSON, nullable=True)
 
     organization = relationship("Organization", back_populates="disciplines")
     analytes = relationship("Analyte", back_populates="discipline", order_by="Analyte.sort_order")
@@ -47,7 +48,8 @@ class Discipline(Base):
     custom_blocks = relationship("CustomBlock", back_populates="discipline")
     computed_recommendations = relationship("ComputedRecommendation", back_populates="discipline")
     triggers = relationship("Trigger", back_populates="discipline")
-    report_template = relationship("ReportTemplate", back_populates="discipline", uselist=False)
+    report_templates = relationship("ReportTemplate", back_populates="discipline")
+    profiles = relationship("ReportProfile", back_populates="discipline", order_by="ReportProfile.sort_order")
 
 
 class SpreadsheetColumn(Base):
@@ -96,8 +98,10 @@ class RequestCode(Base):
     discipline_id = Column(Integer, ForeignKey("disciplines.id"), nullable=False)
     code = Column(String, nullable=False)
     section_key = Column(String, nullable=False)
+    profile_id = Column(Integer, ForeignKey("report_profiles.id"), nullable=True)
 
     discipline = relationship("Discipline", back_populates="request_codes")
+    profile = relationship("ReportProfile")
 
 
 class SimpleField(Base):
@@ -145,16 +149,68 @@ class Trigger(Base):
     discipline = relationship("Discipline", back_populates="triggers")
 
 
+class ReportProfile(Base):
+    __tablename__ = "report_profiles"
+    id = Column(Integer, primary_key=True)
+    discipline_id = Column(Integer, ForeignKey("disciplines.id"), nullable=False)
+    profile_key = Column(String, nullable=False)
+    title = Column(String, nullable=False)
+    analyte_keys_json = Column(JSON, nullable=False, default=list)
+    section_toggles_json = Column(JSON, nullable=False, default=dict)
+    sort_order = Column(Integer, default=0)
+    is_default = Column(Boolean, default=False)
+
+    discipline = relationship("Discipline", back_populates="profiles")
+    guideline_sets = relationship("GuidelineSet", back_populates="profile", cascade="all, delete-orphan")
+    dynamic_columns = relationship("DynamicColumn", back_populates="profile", order_by="DynamicColumn.sort_order", cascade="all, delete-orphan")
+    templates = relationship("ReportTemplate", back_populates="profile")
+
+
+class GuidelineSet(Base):
+    __tablename__ = "guideline_sets"
+    id = Column(Integer, primary_key=True)
+    profile_id = Column(Integer, ForeignKey("report_profiles.id"), nullable=False)
+    name = Column(String, nullable=False)
+
+    profile = relationship("ReportProfile", back_populates="guideline_sets")
+    values = relationship("GuidelineValue", back_populates="guideline_set", order_by="GuidelineValue.sort_order", cascade="all, delete-orphan")
+
+
+class GuidelineValue(Base):
+    __tablename__ = "guideline_values"
+    id = Column(Integer, primary_key=True)
+    guideline_set_id = Column(Integer, ForeignKey("guideline_sets.id"), nullable=False)
+    analyte_key = Column(String, nullable=False)
+    display_value = Column(String, nullable=False)
+    sort_order = Column(Integer, default=0)
+
+    guideline_set = relationship("GuidelineSet", back_populates="values")
+
+
+class DynamicColumn(Base):
+    __tablename__ = "dynamic_columns"
+    id = Column(Integer, primary_key=True)
+    profile_id = Column(Integer, ForeignKey("report_profiles.id"), nullable=False)
+    column_key = Column(String, nullable=False)
+    header_label = Column(String, nullable=False)
+    data_source = Column(String, nullable=False)
+    sort_order = Column(Integer, default=0)
+
+    profile = relationship("ReportProfile", back_populates="dynamic_columns")
+
+
 class ReportTemplate(Base):
     __tablename__ = "report_templates"
     id = Column(Integer, primary_key=True)
-    discipline_id = Column(Integer, ForeignKey("disciplines.id"), nullable=False, unique=True)
+    discipline_id = Column(Integer, ForeignKey("disciplines.id"), nullable=False)
+    profile_id = Column(Integer, ForeignKey("report_profiles.id"), nullable=True)
     template_html = Column(Text, nullable=False)
     created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
     updated_at = Column(DateTime, default=lambda: datetime.now(timezone.utc),
                         onupdate=lambda: datetime.now(timezone.utc))
 
-    discipline = relationship("Discipline", back_populates="report_template")
+    discipline = relationship("Discipline", back_populates="report_templates")
+    profile = relationship("ReportProfile", back_populates="templates")
 
 
 class LabInfo(Base):

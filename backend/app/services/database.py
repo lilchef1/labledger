@@ -20,6 +20,7 @@ def init_db():
         Organization, User, Discipline, SpreadsheetColumn,
         Analyte, RatingBucket, RequestCode, SimpleField,
         CustomBlock, ComputedRecommendation, Trigger,
+        ReportProfile, GuidelineSet, GuidelineValue, DynamicColumn,
         ReportTemplate, LabInfo,
     )
     Base.metadata.create_all(bind=engine)

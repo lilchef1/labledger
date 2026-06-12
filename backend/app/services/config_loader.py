@@ -5,6 +5,7 @@ from app.services.database import get_session
 from app.models.config import (
     Discipline, Analyte, RatingBucket, RequestCode, SimpleField,
     CustomBlock, ComputedRecommendation, Trigger, ReportTemplate, LabInfo,
+    ReportProfile, GuidelineSet, GuidelineValue, DynamicColumn,
 )
 
 
@@ -45,6 +46,34 @@ class ComputedRecConfig:
 
 
 @dataclass
+class GuidelineSetConfig:
+    id: int
+    name: str
+    values: dict[str, str]  # analyte_key -> display_value
+
+
+@dataclass
+class DynamicColumnConfig:
+    column_key: str
+    header_label: str
+    data_source: str
+    sort_order: int
+
+
+@dataclass
+class ReportProfileConfig:
+    id: int
+    profile_key: str
+    title: str
+    analyte_keys: list[str]
+    section_toggles: dict[str, bool]
+    sort_order: int
+    is_default: bool
+    guideline_sets: list[GuidelineSetConfig]
+    dynamic_columns: list[DynamicColumnConfig]
+
+
+@dataclass
 class DisciplineConfig:
     id: int
     org_id: int
@@ -60,6 +89,8 @@ class DisciplineConfig:
     computed_recommendations: list[ComputedRecConfig]
     triggers: list[TriggerConfig]
     template_html: str | None
+    profiles: dict[str, ReportProfileConfig] = field(default_factory=dict)
+    fallback_behavior: dict = field(default_factory=dict)
     lab_info: dict = field(default_factory=dict)
 
 
@@ -83,6 +114,39 @@ def _load_analyte(analyte: Analyte) -> AnalyteConfig:
         recommendation_operator=analyte.recommendation_operator,
         section_name=analyte.section_name,
         rating_buckets=buckets,
+    )
+
+
+def _load_profile(profile: ReportProfile) -> ReportProfileConfig:
+    guideline_sets = []
+    for gs in profile.guideline_sets:
+        values = {gv.analyte_key: gv.display_value for gv in gs.values}
+        guideline_sets.append(GuidelineSetConfig(
+            id=gs.id,
+            name=gs.name,
+            values=values,
+        ))
+
+    dynamic_cols = [
+        DynamicColumnConfig(
+            column_key=dc.column_key,
+            header_label=dc.header_label,
+            data_source=dc.data_source,
+            sort_order=dc.sort_order,
+        )
+        for dc in profile.dynamic_columns
+    ]
+
+    return ReportProfileConfig(
+        id=profile.id,
+        profile_key=profile.profile_key,
+        title=profile.title,
+        analyte_keys=profile.analyte_keys_json or [],
+        section_toggles=profile.section_toggles_json or {},
+        sort_order=profile.sort_order,
+        is_default=profile.is_default,
+        guideline_sets=guideline_sets,
+        dynamic_columns=dynamic_cols,
     )
 
 
@@ -127,8 +191,12 @@ def load_discipline_config(discipline_id: int) -> DisciplineConfig | None:
             for t in disc.triggers
         ]
 
-        tmpl = disc.report_template
-        template_html = tmpl.template_html if tmpl else None
+        tmpls = disc.report_templates
+        template_html = tmpls[0].template_html if tmpls else None
+
+        profiles = {}
+        for p in disc.profiles:
+            profiles[p.profile_key] = _load_profile(p)
 
         lab = disc.organization.lab_info
         lab_dict = {}
@@ -159,6 +227,8 @@ def load_discipline_config(discipline_id: int) -> DisciplineConfig | None:
             computed_recommendations=computed,
             triggers=trigs,
             template_html=template_html,
+            profiles=profiles,
+            fallback_behavior=disc.fallback_behavior_json or {},
             lab_info=lab_dict,
         )
     finally:

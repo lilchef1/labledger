@@ -1,15 +1,9 @@
-import re
-
 from app.services.config_loader import DisciplineConfig
 from app.services.ratings import get_recommendation
 from app.services.computations import COMPUTATION_REGISTRY
 
 
 def compute_all_recommendations(sample: dict, config: DisciplineConfig) -> dict:
-    crop_hort = sample.get("Crop/Hort") or ""
-    is_crop = bool(re.search(r"crop", crop_hort, re.IGNORECASE))
-    rec_unit = "lb/ac" if is_crop else "lb/1000 sq.ft."
-
     recommendations = {}
 
     for key, analyte in config.analytes.items():
@@ -20,7 +14,7 @@ def compute_all_recommendations(sample: dict, config: DisciplineConfig) -> dict:
         recommendations[key] = {
             "needs_recs": needs == "Needs Recs",
             "value": "",
-            "unit": rec_unit,
+            "unit": analyte.unit or "",
         }
 
     for comp in config.computed_recommendations:
@@ -31,9 +25,9 @@ def compute_all_recommendations(sample: dict, config: DisciplineConfig) -> dict:
         if isinstance(result, dict):
             recommendations[comp.analyte_key] = {
                 "needs_recs": result.get("recommendation") == "Needs Recs",
-                "value": result.get("recommendation", ""),
-                "unit_conv": result.get("unit_conv", ""),
-                "unit": result.get("unit", rec_unit),
+                "value": result.get("recommendation", result.get("value", "")),
+                "unit_conv": result.get("unit_conv", result.get("value", "")),
+                "unit": result.get("unit", analyte.unit if (analyte := config.analytes.get(comp.analyte_key)) else ""),
             }
 
     return recommendations

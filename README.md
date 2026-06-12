@@ -1,8 +1,8 @@
 # LabLedger
 
-A data management and report building platform. Import spreadsheets and report templates in common file formats, map data fields to template placeholders, define custom rules and computations, and generate finished reports.
+A low-code platform for turning raw data into finished reports. Upload a spreadsheet and a report template, map the fields together, and generate output. Simple reports need no code at all. Complex data transformations and custom logic scale with the user's technical ability.
 
-The platform is built for users at every level of digital literacy. The core workflow (upload data, map fields, export reports) is straightforward and obvious. Users with more technical comfort can build custom computation logic, conditional display rules, and complex rating systems through the configuration layer.
+LabLedger replaces workflows that typically require programming (R, Python) or complex spreadsheet engineering (Excel formulas, conditional formatting, VBA). The configuration layer exposes all of that functionality through a visual interface: unit conversions, conditional display logic, rating systems, computed fields, template routing. The core workflow is accessible to anyone regardless of technical background, and the platform rewards deeper technical literacy with more powerful customization.
 
 ## Status
 
@@ -28,7 +28,6 @@ Early development. Not yet ready for use.
 - **Frontend:** React, Next.js, Tailwind CSS, shadcn/ui
 - **Database:** SQLite (development), PostgreSQL (production)
 - **Reports:** Jinja2 HTML/CSS templates, WeasyPrint PDF rendering
-- **Deployment:** Docker
 
 ## License
 
