@@ -38,3 +38,15 @@ reports/
 # Database
 *.db
 *.sqlite3
+
+# Deployment configs (org-specific seeds, templates, logos, images)
+deployments/
+backend/seed_*_config.py
+backend/app/templates/*.html
+backend/app/static/images/*
+!backend/app/static/images/.gitkeep
+!backend/app/templates/.gitkeep
+
+# Backend runtime
+backend/logs/
+backend/test_output/
