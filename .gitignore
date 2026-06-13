@@ -48,5 +48,4 @@ backend/app/static/images/*
 !backend/app/templates/.gitkeep
 
 # Backend runtime
-backend/logs/
 backend/test_output/
